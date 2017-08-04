@@ -21,18 +21,13 @@ default_data_type = 'float';
 default_adder_latency = 8;
 
 
-if ( isnumeric(H) == 0 || size(H,1) == 1 || size(H,2) == 1)
+if ((~(isnumeric(H) == 1)) || size(H,1) == 1 || size(H,2) == 1)
     
     error('Input matrix must be numeric and not scalar or vector')
     
 end
 
-if( isnumeric(paral) == 0  || isscalar(paral) == 0)
-    
-    error('Requested level of parallellism should be scalar and numeric')
-
-end
-
+if(~(isnumeric(paral) == 1 ) || isscalar())
 
 if ~isfield(settings, 'matrix_name') settings.matrix_name = default_matrix_name; end
 if ~isfield(settings, 'input_vector') settings.input_vector = rand(size(H,2),1); end

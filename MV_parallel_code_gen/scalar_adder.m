@@ -1,4 +1,4 @@
-number_elements = 16;
+number_elements = 12;
 
 vec_elements = rand(number_elements,1);
 true_answer = sum(vec_elements);
