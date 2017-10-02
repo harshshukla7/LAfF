@@ -19,21 +19,32 @@ default_input_vector_name = 'x';
 default_output_vector_name = 'y';
 default_data_type = 'float';
 default_adder_latency = 8;
+default_user_func_c = 'user_function.c';
+default_user_func_h = 'user_function.h';
+default_dat
 
 
-if ((~(isnumeric(H) == 1)) || size(H,1) == 1 || size(H,2) == 1)
+if ( isnumeric(H) == 0 || size(H,1) == 1 || size(H,2) == 1)
     
     error('Input matrix must be numeric and not scalar or vector')
     
 end
 
-if(~(isnumeric(paral) == 1 ) || isscalar())
+if( isnumeric(paral) == 0  || isscalar(paral) == 0)
+    
+    error('Requested level of parallellism should be scalar and numeric')
+
+end
+
 
 if ~isfield(settings, 'matrix_name') settings.matrix_name = default_matrix_name; end
 if ~isfield(settings, 'input_vector') settings.input_vector = rand(size(H,2),1); end
 if ~isfield(settings, 'input_vector_name') settings.input_vector_name = default_input_vector_name; end
 if ~isfield(settings, 'output_vector_name') settings.output_vector_name = default_output_vector_name; end
 if ~isfield(settings, 'data_type') settings.data_type = default_data_type; end
+if ~isfield(settings, 'adder_latency') settings.adder_latency = default_adder_latency; end
+if ~isfield(settings, 'adder_latency') settings.adder_latency = default_adder_latency; end
+if ~isfield(settings, 'adder_latency') settings.adder_latency = default_adder_latency; end
 if ~isfield(settings, 'adder_latency') settings.adder_latency = default_adder_latency; end
 
 

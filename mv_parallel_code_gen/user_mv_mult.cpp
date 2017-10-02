@@ -1,0 +1,112 @@
+#include "mv_mult.h"
+
+void mv_mult(real y_out[SIZE],real x_in[SIZE])
+{
+	short i, i_acc, j, j_offset, k;
+
+	// matrix 
+	real H[PAR][PART_SIZE*SIZE] = {0.3382515133079037,0.3402016382706530,0.6854112064039103,0.3937076822577935,0.7727275226556869,0.3484837222058765,0.8231185254316261,0.4066580273188295,0.6830268540682940,0.6014281395920986,0.3292061781961160,0.7447552427861331,0.9991247584365847,0.3401666606419359,0.2848384548598178,0.2525219650158795,0.9363027725223539,0.2796176688333473,0.9247281431950750,0.7855776162110845,0.0666344052604190,0.6955056002586417,0.4993940317059458,0.9285248836676876,0.2691202378354730,0.0177180284329330,0.1911715920084949,0.1772755202620809,0.2917456526722308,0.6385066266255350,0.0771534533856184,0.5865770460551188,0.2728997171042178,0.4527238537431563,0.4661162532708516,0.4507474890824889,0.5269436607084196,0.5856579770625748,0.4759942350699736,0.1170147906110954,0.4948316295525573,0.8827422705066625,0.6934103342318307,0.5265665766525548,0.3712503248353668,0.9045816956523666,0.2806099606082405,0.7215181888323551,0.3915443411108871,0.7105127640545864,0.3760966694007610,0.9572091918107977,0.9950125284800352,0.5011541251255360,0.4792406667886745,0.6570649843686319,0.4083874267944586,0.7212609147088103,0.3188958843098935,0.0977497385813179,0.4165866487819505,0.8600791672765772,0.2103776072150774,0.8103263814685280,0.4382076867346090,0.1434323809846046,0.2398529075455589,0.5085861196357225,0.4001858271215152,0.5847656084539119,0.6196851777911678,0.3203623442153978,0.4157307331727811,0.8048382004766920,0.2552261958636121,0.2584968365853021,0.3575555817756102,0.3259258294188844,0.8775925398524255,0.8475647710843390,0.6635295287371097,0.6635879837311340,0.1620075071281760,0.1178208323109059,0.1411376436401548,0.7912647156990554,0.1643209913064337,0.4548378972555756,0.9531603770757420,0.2307253695522218,0.6355091145735927,0.9056326469920711,0.2497219771078316,0.6183502289206068,0.2661719595391222,0.7273798901788984,0.0025296944778789,0.2968805983357771,0.0043834382544579,0.1959879126661013,};
+	#pragma HLS ARRAY_PARTITION variable=H complete dim=1
+	real H_rem[REM_PART_SIZE*SIZE] = {};
+
+	// local copy of the output vector
+	real y_local[PAR][PART_SIZE][ACC_SIZE];
+	#pragma HLS ARRAY_PARTITION variable=y_local complete dim=1
+	#pragma HLS RESOURCE variable=y_local core=RAM_2P_LUTRAM
+	real y_local_rem[REM_PART_SIZE][ACC_SIZE] ;
+	#pragma HLS RESOURCE variable=y_local_rem core=RAM_2P_LUTRAM
+
+	// reset local output vectors
+	reset_local_1: for(i = 0; i < PART_SIZE; i++)
+	{
+		reset_local_2: for(j = 0; j < ACC_SIZE; j++)
+		{
+			#pragma HLS PIPELINE
+			#pragma HLS LOOP_FLATTEN
+			reset_local_3: for(k = 0; k < PAR; k++)
+			{
+				#pragma HLS UNROLL skip_exit_check
+				y_local[k][i][j] = 0;
+			}
+		}
+	}
+	reset_local_rem_1: for(i = 0; i < REM_PART_SIZE; i++)
+	{
+		reset_local_rem_2: for(j = 0; j < ACC_SIZE; j++)
+		{
+			#pragma HLS PIPELINE
+			#pragma HLS LOOP_FLATTEN
+			#if REM_PART_SIZE
+			y_local_rem[i][j] = 0;
+			#endif
+		}
+	}
+
+	// matrix vector multiplication
+	mv_1: for(i = 0, i_acc = 0; i < SIZE; i++, i_acc++)
+	{
+		mv_2: for(j = 0, j_offset = 0; j < PART_SIZE; j++, j_offset+=SIZE)
+		{
+			#pragma HLS DEPENDENCE variable=y_local inter distance=8 true
+			#pragma HLS DEPENDENCE variable=y_local_rem inter distance=8 true
+			#pragma HLS PIPELINE
+	
+			if (i_acc == ACC_SIZE)
+			{
+				i_acc = 0;
+			}
+			mv_3: for(k = 0; k < PAR; k++)
+			{
+				#pragma HLS UNROLL skip_exit_check
+				y_local[k][j][i_acc] += H[k][j_offset+i]*x_in[i];
+			}
+			if(j < REM_PART_SIZE)
+			{
+				y_local_rem[j][i_acc] += H_rem[j_offset+i]*x_in[i];
+			}
+		}
+	}
+
+	// fill the output vector from the local output vector
+	output_1: for(i = 0; i < ACC_SIZE; i++)
+	{
+		output_2: for(j = 0; j < PART_SIZE; j++)
+		{
+			output_3: for(k = 0; k < PAR + !(!(REM_PART_SIZE)); k++)
+			{
+				#pragma HLS PIPELINE
+				#pragma HLS DEPENDENCE variable=y_out inter distance=10 true
+				if(i == 0)
+				{
+					if(k == PAR)
+					{
+						if(j < REM_PART_SIZE)
+						{
+							y_out[k*PART_SIZE + j] = y_local_rem[j][i];
+						}
+					}
+					else
+					{
+						y_out[k*PART_SIZE+j] = y_local[k][j][i];
+					}
+				}
+				else
+				{
+					if(k == PAR)
+					{
+						if(j < REM_PART_SIZE)
+						{
+							y_out[k*PART_SIZE + j] += y_local_rem[j][i];
+						}
+					}
+					else
+					{
+						y_out[k*PART_SIZE+j] += y_local[k][j][i];
+					}
+				}
+			}
+		}
+	}
+
+
+}

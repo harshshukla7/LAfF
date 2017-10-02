@@ -1,8 +1,12 @@
-function output = delete_this(H, paral, settings)
+function output = Vec_addition(length_vec, settings)
 
+%% Question to be discussed:
+%%% option 1: What do we assume,shall we write just another m file to save all the data and here we only do abtract code generation 
+%%% option 2: we also pass the vector values or at least keep that as an
+%%% optional setting and save the data from here. From the user point of
+%%% view I think this option is much better
 %% Mandatory input arguments:
-% 1. Input Matrix H
-% 2. Level of parallelism
+% 1. settings
 %  Optional input arguments
 % 1. 'matrix_name': Name of the matrix
 % 2. 'input_vector': value of input vector
@@ -17,9 +21,9 @@ function output = delete_this(H, paral, settings)
 %11. 'data_file_h': File name given by user
 
 
-default_matrix_name = 'H';
-default_input_vector_name = 'x';
-default_output_vector_name = 'y';
+default_input_vector_name1 = 'x';
+default_input_vector_name2 = 'y';
+default_output_vector_name = 'z';
 default_data_type = 'float';
 default_adder_latency = 8;
 default_func_file_c = 'user_function.c';
@@ -27,22 +31,20 @@ default_func_file_h = 'user_function.h';
 default_data_file_h = 'user_data.h';
 
 
-if ( isnumeric(H) == 0 || size(H,1) == 1 || size(H,2) == 1)
-    
-    error('Input matrix must be numeric and not scalar or vector')
-    
-end
 
-if( isnumeric(paral) == 0  || isscalar(paral) == 0)
+
+if( isnumeric(length_vec) == 0  || isscalar(length_vec) == 0)
     
-    error('Requested level of parallellism should be scalar and numeric')
+    error('Vector length should be scalar and numeric')
 
 end
 
 
-if ~isfield(settings, 'matrix_name'), settings.matrix_name = default_matrix_name; end
-if ~isfield(settings, 'input_vector'), settings.input_vector = rand(size(H,2),1); end
-if ~isfield(settings, 'input_vector_name'), settings.input_vector_name = default_input_vector_name; end
+
+if ~isfield(settings, 'input_vector1'), settings.input_vector1 = rand(length_vec,1); end
+if ~isfield(settings, 'input_vector2'), settings.input_vector2 = rand(length_vec,1); end
+if ~isfield(settings, 'input_vector_name1'), settings.input_vector_name1 = default_input_vector_name1; end
+if ~isfield(settings, 'input_vector_name2'), settings.input_vector_name2 = default_input_vector_name2; end
 if ~isfield(settings, 'output_vector_name'), settings.output_vector_name = default_output_vector_name; end
 if ~isfield(settings, 'data_type'), settings.data_type = default_data_type; end
 if ~isfield(settings, 'adder_latency'), settings.adder_latency = default_adder_latency; end
