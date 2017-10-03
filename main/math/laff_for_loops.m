@@ -4,7 +4,7 @@ function [] = laff_for_loops( ops , loop_length )
 %TO DO: allow users to choose the directives
 %TO DO: support for altera as well
 
-fileID = fopen('user_laff_main.cpp','w');
+fileID = fopen('user_laff_main.cpp','a');
 
 
 fprintf(fileID, 'for(i=0; i<%d; i++){ \n', loop_length);
