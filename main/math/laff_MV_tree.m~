@@ -1,4 +1,4 @@
-function [] = laff_MV_tree(H, input_name, output_name, settings)
+function [] = laff_MV_tree(H, i settings)
 % this script generates FPGA synthesisable C code for dense matrxi vector
 % multiplication y_out = H*x_in with a reduction tree approach
 
@@ -11,14 +11,6 @@ data_t = 'data_t_laff_out_out';
  
  
  SIZE = size(H,1);
-
- 
- %% call the function from main file
-
-fileID = fopen('user_laff_main.cpp','a');
-fprintf(fileID,strcat('mv_mult(', input_name, ',', output_name, ')\n'));
-flcose(fileID);
-
 
 %% generate code 
 fileID = fopen('user_laff_func.h','a');

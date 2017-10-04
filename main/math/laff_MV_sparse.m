@@ -7,7 +7,7 @@ function [] = laff_MV_sparse(H, file_name, reset_enable)
     % if reset_enable == 1 => y_out = H*x_in, else => y_out = y_out + H*x_in
  
    
-    data_t = 'data_t_primal_out';
+     data_t = 'data_t_laff_out_out';
 
     % identify the sparsity pattern
     [row, col, val] = find(H);
@@ -22,8 +22,8 @@ function [] = laff_MV_sparse(H, file_name, reset_enable)
     %max(max(abs(sort([coo.row; coo.col; coo.val],2) - sort([coo_scheduled.row; coo_scheduled.col; coo_scheduled.val],2))));
     
     % generate header file
-    tp_name = strcat('user_', file_name, '_sparse_mv_mult.h');
-    fileID = fopen(sprintf(tp_name),'w');
+    
+    fileID = fopen('user_laff_func.h','a');
     fprintf(fileID,'#include "foo_data.h" \n');
     fprintf(fileID,'#define %s_SIZE_row %d\n', file_name, max(row));
     fprintf(fileID,'#define %s_SIZE_col %d\n', file_name, max(col));
@@ -32,9 +32,8 @@ function [] = laff_MV_sparse(H, file_name, reset_enable)
     fclose(fileID);
     
     % generate cpp file
-    tp_name = strcat('user_', file_name, '_sparse_mv_mult.cpp');
-    fileID = fopen( sprintf(tp_name), 'w');
-    fprintf(fileID,strcat('#include',32,'"user_',file_name, '_sparse_mv_mult.h"\n'));
+    
+    fileID = fopen( 'user_laff_func.cpp', 'a');
     fprintf(fileID,'\n');
     fprintf(fileID,strcat('void',32, file_name, '_sparse_mv_mult', '(',data_t,' y_out[',file_name,'_SIZE_row],',data_t,' x_in[',file_name,'_SIZE_col])\n'));
     fprintf(fileID,'{\n');

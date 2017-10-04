@@ -33,9 +33,10 @@ low_eig_inv = 1/eig_val(end);
 
 for i=1:iterations
 
-    t = I_H*y-low_eig_inv*f;
+    
     
     z = z1;
+    t = I_H*y-low_eig_inv*f;
     z1 = min(t,ub);
     z1 = max(z1,lb);
     
@@ -43,3 +44,43 @@ for i=1:iterations
     
     
 end
+
+
+%% initial setup
+
+laff_init([]);
+
+%% code generation using laff
+
+laff_write_data('I_H', I_H, 'real');
+laff_write_data('lf', low_eig_inv*f, 'real');
+laff_write_data('lb', lb, 'real');
+laff_write_data('ub', ub, 'real');
+laff_write_data('beta_1', beta+1, 'real');
+laff_write_data('beta', beta, 'real');
+laff_write_data('itr', iterations, 'int');
+laff_write_data('z', zeros(n,1), 'real');
+laff_write_data('z_prev', zeros(n,1), 'real');
+laff_write_data('y', zeros(n,1), 'real');
+laff_write_data('t', zeros(n,1), 'real');
+
+
+%% add functions
+PAR_requested = 1;
+
+% copy vector
+laff_copy_vector('z_prev', 'z', n);
+
+% matrix vector
+laff_MV_MAC(I_H, PAR_requested, 'z', 'y', []);
+
+% vector subtraction
+laff_vector_scale_add('t', 'z', 'lf', n, 1, -1 );
+
+
+% min max operation
+laff_box_clipping('z', 't', n, lmin, umax);
+
+% vector scaling and subtraction
+laff_vector_scale_add('y', 'z', 'z_prev', n, (1+beta), -beta );
+

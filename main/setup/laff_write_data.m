@@ -11,7 +11,49 @@ if ((size(x,1)>1 && size(x,2)>1))
     
 end
 
-fd  = fopen('laff_data_gen.cpp','a');
+
+%% add data declaration in h file
+
+fd  = fopen('user_laff_data.h','a');
+
+%%%% check if it a scalar
+if ((size(x,1) == 1 && size(x,2) == 1))
+    
+    if (strcmp(type, 'int'))
+        
+        fprintf(fd, 'extern int %s; \n', name);
+        
+    else
+       
+        fprintf(fd, 'extern real %s; \n', name);
+        
+
+    end
+    
+    
+%%% if it is a vector    
+else
+    
+    
+    if (strcmp(type, 'int'))
+        
+        fprintf(fd, 'extern int %s[%d]; \n', name, length(x));
+        
+        
+    else
+        
+        fprintf(fd, 'extern real %s[%d]; \n', name, length(x));
+        
+    end
+end
+
+fclose(fd);
+
+
+%% write data in c file
+
+
+fd  = fopen('user_laff_data.cpp','a');
 
 %%%% check if it a scalar
 if ((size(x,1) == 1 && size(x,2) == 1))
@@ -37,7 +79,6 @@ else
         fprintf(fd, 'int %s[%d] = {%d', name, length(x), x(1));
         fprintf(fd, ',%d', x(2:end));
         fprintf(fd, '};\n');
-        fclose(fd);
         
         
     else
@@ -45,11 +86,11 @@ else
         fprintf(fd, 'real %s[%d] = {%2.16f', name, length(x), x(1));
         fprintf(fd, ',%2.16f', x(2:end));
         fprintf(fd, '};\n');
-        fclose(fd);
         
     end
 end
 
-
+fclose(fd);
+       
 
 end

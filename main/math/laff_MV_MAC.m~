@@ -36,8 +36,8 @@ ACC_SIZE = ceil(ADDER_LATENCY/PART_SIZE); % using vectorized accumulator allows 
 %% call the function from main file
 
 fileID = fopen('user_laff_main.cpp','a');
-fprintf(fileID,strcat('mv_mult(', output_name, ',', input_name, ')\n'));
-fclose(fileID);
+fprintf(fileID,strcat('mv_mult(', output_name, ',', output_name, ')\n'));
+flcose(fileID);
 
 
 %% generate code 

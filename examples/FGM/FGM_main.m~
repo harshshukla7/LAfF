@@ -1,14 +1,15 @@
 
 n = 5;
-iterations = 100;
-
+iterations = 1000;
+lmin = -1;
+umax = 1;
 
 H = 50*rand(n,n);
 H = H'*H;
 f = -1*ones(n,1);
 
-lb = -1*ones(n,1);
-ub = 1*ones(n,1);
+lb = lmin*ones(n,1);
+ub = umax*ones(n,1);
 
 x_quadprog = quadprog(H,f,[],[],[],[],lb,ub);
 
@@ -21,11 +22,12 @@ highest_sqrt =  sqrt(eig_val(end));
 
 beta = (highest_sqrt-lowest_sqrt)/(highest_sqrt+lowest_sqrt);
 
-z = zeros(n,1);
-y = z;
+z1 = zeros(n,1);
+y = z1;
+z = z1;
 
-I_H = eye(n)-H/eig_val(1);
-low_eig_inv = 1/eig_val(1);
+I_H = eye(n)-H/eig_val(end);
+low_eig_inv = 1/eig_val(end);
 
 %% FGM algorithm
 
@@ -33,7 +35,42 @@ for i=1:iterations
 
     t = I_H*y-low_eig_inv*f;
     
-    y = (1+beta)z
+    z = z1;
+    z1 = min(t,ub);
+    z1 = max(z1,lb);
+    
+    y = (1+beta)*z1 - beta*z;
     
     
 end
+
+
+%% initial setup
+
+laff_init([]);
+
+%% code generation using laff
+
+laff_write_data('I_H', I_H, 'real');
+laff_write_data('lf', low_eig_inv*f, 'real');
+laff_write_data('lb', lb, 'real');
+laff_write_data('ub', ub, 'real');
+laff_write_data('beta_1', beta+1, 'real');
+laff_write_data('beta', beta, 'real');
+laff_write_data('itr', iterations, 'int');
+laff_write_data('z', zero, 'real');
+laff_write_data('z_prev', beta+1, 'real');
+laff_write_data('y', beta, 'real');
+
+
+%% add functions
+
+% matrix vector
+
+% vector subtraction
+
+% copy vector
+
+% min max operation
+
+% vector scaling and subtraction

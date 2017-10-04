@@ -14,7 +14,7 @@ function [ output_args ] = laff_init( settings )
 %              default      := one input of dimension one i.e.
 %                              scalar
 %   settings.size_outputs   := vector with dimension of each output (only for protoip)
-%             default       := one output with dimension one
+%             default       := one output with dimension one 
 
 % TO DO : throw an error when arguments does not match with available
 % options
@@ -72,28 +72,17 @@ end
 
 %%%% this will be the main file for user's algorithm
 fileID = fopen('user_laff_main.cpp','w');
-fprintf('#include "user_laff_main.h" \n');
-fprintf('void laff_main_func(real laff_in_in[%d], real laff_out_out[%d]){\n', settings.size_inputs, settings.size_outputs);
 fclose(fileID);
 
 
 %%% corresponding h file
 
 fileID = fopen('user_laff_main.h','w');
-fprintf('#include <stdio.h> \n');
-fprintf('#include <string.h> \n');
-fprintf('#include "user_laff_func.h" \n');
-fprintf('#include "user_laff_data.h" \n');
-fprintf('#include "user_laff_matrix_ops.h" \n');
-fprintf('void laff_main_func(real laff_in_in[%d], real laff_out_out[%d]);\n', settings.size_inputs, settings.size_outputs);
-
-
 fclose(fileID);
 
 
 %%% this file will contain problem data
 fileID = fopen('user_laff_data.cpp','w');
-fprintf('#include "user_laff_data.h" \n')
 fclose(fileID);
 
 %%% corresponding h file
@@ -102,14 +91,13 @@ fclose(fileID);
 
 %%% this file will contain code generated function
 fileID = fopen('user_laff_func.cpp','w');
-fprintf('#include "user_laff_func.h" \n');
 fclose(fileID);
 
 %%% corresponding h file
 fileID = fopen('user_laff_func.h','w');
 fclose(fileID);
 
-%%% for all the directives and data type definitions
+%%% for all the directives and data type definitions 
 fileID = fopen('user_laff_decl.h','w');
 fclose(fileID);
 
@@ -129,20 +117,22 @@ else
 end
 
 if (protoip == 1)
-    
-    %%% check number of inputs and dimensions
-    
-    %%% check number of outputs and dimensions
-    
-    %%% call make template for protoip
-    
-else
+
+%%% check number of inputs and dimensions
+
+%%% check number of outputs and dimensions
+
+%%% call make template for protoip
+
+else 
     
     fileID = fopen('user_laff_decl.h','a');
-    fprintf(fileID, 'typedef float real; \n');
+    fprintf(fileID, '#define real flaot; \n');
     fclose(fileID);
-    
-    
+
+    fileID = fopen('user_laff_decl.h','a');
+    fprintf(fileID, '#define real flaot; \n');
+    fclose(fileID);
     
 end
 
