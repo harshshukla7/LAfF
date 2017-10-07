@@ -7,7 +7,7 @@ function [] = laff_MV_sparse(H, file_name, reset_enable)
     % if reset_enable == 1 => y_out = H*x_in, else => y_out = y_out + H*x_in
  
    
-     data_t = 'data_t_laff_out_out';
+     data_t = 'data_t_laff_in_in';
 
     % identify the sparsity pattern
     [row, col, val] = find(H);

@@ -1,4 +1,4 @@
-function [ output_args ] = laff_init( settings )
+function  laff_init( input_size_laff_init, output_size_laff_init, settings )
 %Initial set up
 %   settings.datatype       := 'float' or 'fixed'
 %              default      :=  'float'
@@ -19,6 +19,8 @@ function [ output_args ] = laff_init( settings )
 % TO DO : throw an error when arguments does not match with available
 % options
 
+settings.size_inputs = input_size_laff_init;
+settings.size_outputs = output_size_laff_init;
 
 %%% Dataype
 if (isfield(settings,'datatype') == 1)
@@ -72,20 +74,23 @@ end
 
 %%%% this will be the main file for user's algorithm
 fileID = fopen('user_laff_main.cpp','w');
-fprintf('#include "user_laff_main.h" \n');
-fprintf('void laff_main_func(real laff_in_in[%d], real laff_out_out[%d]){\n', settings.size_inputs, settings.size_outputs);
+fprintf(fileID,'#include "user_laff_main.h" \n \n \n \n');
+fprintf(fileID,'void laff_main_func(real laff_in_in[%d], real laff_out_out[%d]){\n \n', settings.size_inputs, settings.size_outputs);
 fclose(fileID);
 
 
 %%% corresponding h file
 
 fileID = fopen('user_laff_main.h','w');
-fprintf('#include <stdio.h> \n');
-fprintf('#include <string.h> \n');
-fprintf('#include "user_laff_func.h" \n');
-fprintf('#include "user_laff_data.h" \n');
-fprintf('#include "user_laff_matrix_ops.h" \n');
-fprintf('void laff_main_func(real laff_in_in[%d], real laff_out_out[%d]);\n', settings.size_inputs, settings.size_outputs);
+fprintf(fileID,'#include <stdio.h> \n');
+fprintf(fileID,'#include <stdlib.h> \n');
+fprintf(fileID,'#include <string.h> \n');
+fprintf(fileID,'#include "user_laff_func.h" \n');
+fprintf(fileID,'#include "user_laff_data.h" \n');
+fprintf(fileID,'#include "foo_data.h" \n');
+fprintf(fileID,'#include "user_laff_matrix_ops.h" \n');
+
+fprintf(fileID,'void laff_main_func(real laff_in_in[%d], real laff_out_out[%d]);\n', settings.size_inputs, settings.size_outputs);
 
 
 fclose(fileID);
@@ -93,24 +98,35 @@ fclose(fileID);
 
 %%% this file will contain problem data
 fileID = fopen('user_laff_data.cpp','w');
-fprintf('#include "user_laff_data.h" \n')
+fprintf(fileID,'#include "user_laff_data.h" \n \n \n \n');
 fclose(fileID);
 
 %%% corresponding h file
 fileID = fopen('user_laff_data.h','w');
+fprintf(fileID,'#include <stdio.h> \n');
+fprintf(fileID,'#include <stdlib.h> \n');
+fprintf(fileID,'#include <string.h> \n');
+fprintf(fileID,'#include "foo_data.h" \n');
+fprintf(fileID,'#define real data_t_laff_in_in \n');
+
 fclose(fileID);
 
 %%% this file will contain code generated function
 fileID = fopen('user_laff_func.cpp','w');
-fprintf('#include "user_laff_func.h" \n');
+fprintf(fileID,'#include "user_laff_func.h" \n \n \n \n');
 fclose(fileID);
 
 %%% corresponding h file
 fileID = fopen('user_laff_func.h','w');
+fprintf(fileID,'#include "user_laff_data.h" \n');
+fprintf(fileID,'#include "foo_data.h" \n');
+
 fclose(fileID);
 
 %%% for all the directives and data type definitions
 fileID = fopen('user_laff_decl.h','w');
+fprintf(fileID,'#include "user_laff_data.h" \n');
+fprintf(fileID,'#include "foo_data.h" \n');
 fclose(fileID);
 
 

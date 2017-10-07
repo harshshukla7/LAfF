@@ -1,3 +1,4 @@
+clear all; close all; clc
 
 n = 5;
 iterations = 1000;
@@ -48,7 +49,7 @@ end
 
 %% initial setup
 
-laff_init([]);
+laff_init(10,10,[]);
 
 %% code generation using laff
 
@@ -68,11 +69,14 @@ laff_write_data('t', zeros(n,1), 'real');
 %% add functions
 PAR_requested = 1;
 
+% begin for algorithm
+laff_for_loop_begin('itr', 'main_loop');
+
 % copy vector
 laff_copy_vector('z_prev', 'z', n);
 
 % matrix vector
-laff_MV_MAC(I_H, PAR_requested, 'z', 'y', []);
+laff_MV_MAC(I_H, PAR_requested, 'y', 'z', []);
 
 % vector subtraction
 laff_vector_scale_add('t', 'z', 'lf', n, 1, -1 );
@@ -83,4 +87,18 @@ laff_box_clipping('z', 't', n, lmin, umax);
 
 % vector scaling and subtraction
 laff_vector_scale_add('y', 'z', 'z_prev', n, (1+beta), -beta );
+
+%end for algorithm
+laff_for_loop_end;
+
+laff_end;
+
+%% for ProtoIP
+number_inputs_protoip = 10;
+number_outputs_protoip = 10;
+laff_template_generator(number_inputs_protoip, number_outputs_protoip , []);
+
+%% Deploy on FPGA
+
+% laff_template;
 

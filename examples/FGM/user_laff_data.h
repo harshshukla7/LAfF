@@ -1,3 +1,8 @@
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include "foo_data.h" 
+#define real data_t_laff_in_in 
 extern real I_H[25]; 
 extern real lf[5]; 
 extern real lb[5]; 

@@ -18,7 +18,7 @@ if (~isfield (settings, 'adder_lat')); settings.adder_lat = 8; end
  ADDER_LATENCY = settings.adder_lat; % max allowed adder latency (usually in the range 8 to 12 clock cycles)
  
  
- data_t = 'data_t_laff_out_out';
+ data_t = 'data_t_laff_in_in';
  
   
  SIZE_row = size(H,1);
@@ -36,12 +36,13 @@ ACC_SIZE = ceil(ADDER_LATENCY/PART_SIZE); % using vectorized accumulator allows 
 %% call the function from main file
 
 fileID = fopen('user_laff_main.cpp','a');
-fprintf(fileID,strcat('mv_mult(', output_name, ',', input_name, ')\n'));
+fprintf(fileID,strcat('mv_mult(', output_name, ',', input_name, ');\n'));
 fclose(fileID);
 
 
 %% generate code 
 fileID = fopen('user_laff_func.h','a');
+fprintf(fileID,'#include "foo_data.h"\n');
 fprintf(fileID,'#define SIZE_row %d\n', SIZE_row);
 fprintf(fileID,'#define SIZE_col %d\n', SIZE_col);
 fprintf(fileID,'#define PAR %d\n', PAR);
