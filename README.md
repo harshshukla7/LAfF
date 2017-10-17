@@ -1,6 +1,7 @@
 # LAfF
 Linear Algebra for FPGA
 
+<<<<<<< HEAD
 
 ![](https://github.com/harshshukla7/LAfF/blob/harsh/documentation/images/LAfF_logo.jpg)
 
@@ -14,3 +15,6 @@ There will be three files generated
 3. **user_data.h** : This contains all the data.
 
 It is possible to write different function in the same c file or different c files.
+=======
+![](https://github.com/harshshukla7/LAfF/blob/harsh/documentation/images/LAfF_logo.jpg)
+>>>>>>> ed78df33839c4bf880176bcf2d75d2e369d2a3c0
